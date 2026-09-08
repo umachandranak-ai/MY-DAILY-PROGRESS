@@ -1,0 +1,25 @@
+A banking application recevies a phone number . For secrity it should hide all digits except the last 4 digits .
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+import java.util.Scanner;
+
+public class PhoneNumberMasking {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter phone number: ");
+        String phone = sc.nextLine();
+
+        if (phone.length() <= 4) {
+            System.out.println("Masked Number: " + phone);
+        } else {
+            String masked = "*".repeat(phone.length() - 4)
+                         + phone.substring(phone.length() - 4);
+
+            System.out.println("Masked Number: " + masked);
+        }
+
+        sc.close();
+    }
+}
