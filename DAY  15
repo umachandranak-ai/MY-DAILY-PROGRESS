@@ -1,0 +1,152 @@
+You are given a 2D integer array intervals, where intervals[i] = [li, ri, weighti]. Interval i starts at position li and ends at ri, 
+and has a weight of weighti.
+You can choose up to 4 non-overlapping intervals.
+The score of the chosen intervals is defined as the total sum of their weights.
+Return the lexicographically smallest array of at most 4 indices from intervals with maximum score,
+representing your choice of non-overlapping intervals.
+Two intervals are said to be non-overlapping if they do not share any points. In particular,
+intervals sharing a left or right boundary are considered overlapping.
+
+ Example 1:
+Input: intervals = [[1,3,2],[4,5,2],[1,5,5],[6,9,3],[6,7,1],[8,9,1]]
+Output: [2,3]
+
+Explanation:
+You can choose the intervals with indices 2, and 3 with respective weights of 5, and 3.
+
+Example 2:
+Input: intervals = [[5,8,1],[6,7,7],[4,7,3],[9,10,6],[7,8,2],[11,14,3],[3,5,5]]
+Output: [1,3,5,6]
+
+Explanation:
+You can choose the intervals with indices 1, 3, 5, and 6 with respective weights of 7, 6, 3, and 5.
+
+Constraints:
+1 <= intevals.length <= 5 * 104
+intervals[i].length == 3
+intervals[i] = [li, ri, weighti]
+1 <= li <= ri <= 109
+1 <= weighti <= 109
+
+
+/**
+ * @param {number[][]} intervals
+ * @return {number[]}
+ */
+var maximumWeight = function(intervals) {
+    const n = intervals.length;
+    const K = 4;
+
+    const a = intervals.map((x, i) => [x[0], x[1], x[2], i]);
+
+    a.sort((x, y) => x[1] - y[1]);
+
+    const ends = a.map(x => x[1]);
+
+    const dp = Array.from({ length: K + 1 }, () => Array(n + 1).fill(null));
+
+    for (let i = 0; i <= n; i++) {
+        dp[0][i] = { score: 0, ids: [] };
+    }
+
+    const better = (a, b) => {
+        if (a === null) return false;
+        if (b === null) return true;
+
+        if (a.score !== b.score) return a.score > b.score;
+
+        const len = Math.min(a.ids.length, b.ids.length);
+
+        for (let i = 0; i < len; i++) {
+            if (a.ids[i] !== b.ids[i]) {
+                return a.ids[i] < b.ids[i];
+            }
+        }
+
+        return a.ids.length < b.ids.length;
+    };
+
+    const lowerBound = (length, target) => {
+        let lo = 0;
+        let hi = length;
+
+        while (lo < hi) {
+            const mid = lo + Math.floor((hi - lo) / 2);
+
+            if (ends[mid] >= target) {
+                hi = mid;
+            } else {
+                lo = mid + 1;
+            }
+        }
+
+        return lo;
+    };
+
+    for (let i = 1; i <= n; i++) {
+        const [left, , weight, originalIndex] = a[i - 1];
+
+        const p = lowerBound(i - 1, left);
+
+        for (let k = 1; k <= K; k++) {
+            dp[k][i] = dp[k][i - 1];
+
+            if (dp[k - 1][p] !== null) {
+                const ids = [...dp[k - 1][p].ids, originalIndex];
+
+                ids.sort((x, y) => x - y);
+
+                const take = {
+                    score: dp[k - 1][p].score + weight,
+                    ids
+                };
+
+                if (better(take, dp[k][i])) {
+                    dp[k][i] = take;
+                }
+            }
+        }
+    }
+
+    let answer = null;
+
+    for (let k = 1; k <= K; k++) {
+        if (better(dp[k][n], answer)) {
+            answer = dp[k][n];
+        }
+    }
+
+    return answer.ids;
+};
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+Given an integer n, return the number of trailing zeroes in n!.
+Note that n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1.
+
+ Example 1:
+Input: n = 3
+Output: 0
+Explanation:
+3! = 6, no trailing zero.
+
+Example 2:
+Input: n = 5
+Output: 1
+Explanation:
+5! = 120, one trailing zero.
+
+Example 3:
+Input: n = 0
+Output: 0
+
+
+var trailingZeroes = function(n) {
+    let count = 0, divisor = 5;
+    while (n >= divisor) {
+        count += Math.floor(n / divisor);
+        divisor *= 5;
+    }
+    return count;
+};
