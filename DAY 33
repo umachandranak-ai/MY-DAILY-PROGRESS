@@ -1,0 +1,121 @@
+CREATE TABLE EmployeeSales (
+    employee_id INT,
+    employee_name VARCHAR(50),
+    sale_month DATE,
+    sales DECIMAL(10,2)
+);
+
+INSERT INTO EmployeeSales VALUES
+(101, 'Arun', '2026-08-01', 45000),
+(101, 'Arun', '2026-09-01', 52000),
+(102, 'Bala', '2026-08-01', 38000),
+(102, 'Bala', '2026-09-01', 35000),
+(103, 'Chandru', '2026-08-01', 60000),
+(103, 'Chandru', '2026-09-01', 75000);
+
+SELECT
+    employee_id,
+    employee_name,
+    MAX(CASE
+        WHEN YEAR(sale_month) = 2026
+        AND MONTH(sale_month) = 9
+        THEN sales
+    END) AS current_month_sales,
+
+    MAX(CASE
+        WHEN YEAR(sale_month) = 2026
+        AND MONTH(sale_month) = 8
+        THEN sales
+    END) AS previous_month_sales,
+
+    MAX(CASE
+        WHEN YEAR(sale_month) = 2026
+        AND MONTH(sale_month) = 9
+        THEN sales
+    END)
+    -
+    MAX(CASE
+        WHEN YEAR(sale_month) = 2026
+        AND MONTH(sale_month) = 8
+        THEN sales
+    END) AS difference
+
+FROM EmployeeSales
+GROUP BY employee_id, employee_name;
+------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE employees (
+    employee_id INT,
+    employee_name VARCHAR(50),
+    performance_score INT
+);
+
+INSERT INTO employees VALUES
+(1, 'Arun', 95),
+(2, 'Bala', 85),
+(3, 'Chandru', 75),
+(4, 'Deepak', 65),
+(5, 'Ezhil', 90),
+(6, 'Fathima', 80),
+(7, 'Gokul', 70),
+(8, 'Hari', 60);
+
+SELECT
+    employee_id,
+    employee_name,
+    performance_score,
+    NTILE(4) OVER (ORDER BY performance_score DESC) AS performance_group
+FROM employees;
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE employee_sales (
+    employee_id INT,
+    employee_name VARCHAR(50),
+    month_name VARCHAR(20),
+    sales INT
+);
+
+INSERT INTO employee_sales VALUES
+(1, 'Arun', 'January', 50000),
+(2, 'Bala', 'January', 70000),
+(3, 'Charan', 'January', 60000),
+(4, 'David', 'January', 70000),
+(5, 'Ezhil', 'January', 40000),
+(6, 'Arun', 'February', 80000),
+(7, 'Bala', 'February', 60000),
+(8, 'Charan', 'February', 80000),
+(9, 'David', 'February', 50000),
+(10, 'Ezhil', 'February', 60000);
+
+SELECT
+    employee_id,
+    employee_name,
+    month_name,
+    sales,
+    RANK() OVER (
+        PARTITION BY month_name
+        ORDER BY sales DESC
+    ) AS sales_rank
+FROM employee_sales
+ORDER BY month_name, sales_rank;
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+-- create
+CREATE TABLE EMPLOYEE (
+  empId INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  dept TEXT NOT NULL
+);
+
+-- insert
+INSERT INTO EMPLOYEE VALUES (0001, 'Clark', 'Sales');
+INSERT INTO EMPLOYEE VALUES (0002, 'Dave', 'Accounting');
+INSERT INTO EMPLOYEE VALUES (0003, 'Ava', 'Sales');
+
+-- fetch 
+SELECT * FROM EMPLOYEE WHERE dept = 'Sales';
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
